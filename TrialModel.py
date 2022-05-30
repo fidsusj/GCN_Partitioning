@@ -1,16 +1,20 @@
-from __future__ import division
-from __future__ import print_function
-import tqdm
-import time
+from __future__ import division, print_function
+
 import argparse
+import time
+
+import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from utils import *
+import tqdm
 from scipy import sparse
+
 from models import *
+from preprocessing import input
+from utils import *
 
 
 def train(model, x, adj, A, optimizer):
@@ -47,11 +51,13 @@ def test(model, x, adj, A, *argv):
         print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(CutLoss.apply(Y,A).item()))
 
 
-def main():
+if __name__ == '__main__':
     """
     Adjacency matrix and modifications
     """
-    A = input_matrix()
+    nx_graph = input.read_partitioned_graph("./data/experimental/road/road-euroroad.graph", "./data/experimental/road/road-euroroad.16.0.ptn", 16)
+    A = nx.to_scipy_sparse_matrix(nx_graph)
+    # A = input_matrix()
 
     # Modifications
     A_mod = A + sp.eye(A.shape[0])  # Adding Self Loop
@@ -87,7 +93,3 @@ def main():
 
     # Test the best partition
     test(model, x, adj, As)
-
-
-if __name__ == '__main__':
-    main()

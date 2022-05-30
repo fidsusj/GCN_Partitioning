@@ -1,17 +1,19 @@
 import math
+
 import numpy as np
-import torch
 import scipy.sparse as sp
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-import torch.nn.functional as F
+import torch
 import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.modules.module import Module
+from torch.nn.parameter import Parameter
+
 from models import *
 
 
 def input_matrix():
     """
-    Returns a test sparse SciPy adjecency matrix
+    Returns a test sparse SciPy adjacency matrix
     """
     # N = 8
     # data = np.ones(2 * 11)

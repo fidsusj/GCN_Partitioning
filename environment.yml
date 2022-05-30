@@ -10,4 +10,6 @@ dependencies:
   - PyYAML==5.3
   - scipy==1.4.1
   - torch==1.4.0
+  - networkx=2.6
   - tqdm==4.42.1
+  - isort
