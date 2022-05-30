@@ -8,10 +8,11 @@ import torch.nn.functional as F
 import torch.nn as nn
 from models import *
 
+
 def input_matrix():
-    '''
+    """
     Returns a test sparse SciPy adjecency matrix
-    '''
+    """
     # N = 8
     # data = np.ones(2 * 11)
     # row = np.array([0,0,1,1,1,2,2,2,3,3,3,4,4,4,4,5,5,6,6,6,7,7])
@@ -30,6 +31,7 @@ def input_matrix():
     A = sp.csr_matrix((data, (row, col)), shape=(N, N))
 
     return A
+
 
 def check_grad(model, x, adj, A, As):
     Y = model(x, adj)
@@ -74,7 +76,6 @@ class SparseMM(torch.autograd.Function):
 
 
 class GCN(torch.nn.Module):
-
     def __init__(self, gl, ll, dropout):
         super(GCN, self).__init__()
         if ll[0] != gl[-1]:
@@ -107,7 +108,7 @@ class GCN(torch.nn.Module):
 
 
 def custom_loss(Y, A):
-    '''
+    """
     loss function described in https://arxiv.org/abs/1903.00614
 
     arguments:
@@ -116,14 +117,17 @@ def custom_loss(Y, A):
 
     Returns:
         Loss : Y/Gamma * (1 - Y)^T dot A
-    '''
+    """
     D = torch.sum(A, dim=1)
     Gamma = torch.mm(Y.t(), D.unsqueeze(1))
     # print(Gamma)
     loss = torch.sum(torch.mm(torch.div(Y.float(), Gamma.t()), (1 - Y).t().float()) * A.float())
     return loss
 
+
 # loss = custom_loss(Y, A)
+
+
 def to_sparse(x):
     """ converts dense tensor x to sparse format """
     x_typename = torch.typename(x).split('.')[-1]
@@ -136,8 +140,9 @@ def to_sparse(x):
     values = x[tuple(indices[i] for i in range(indices.shape[0]))]
     return sparse_tensortype(indices, values, x.size())
 
+
 def custom_loss_sparse(Y, A):
-    '''
+    """
     loss function described in https://arxiv.org/abs/1903.00614
 
     arguments:
@@ -146,7 +151,7 @@ def custom_loss_sparse(Y, A):
 
     Returns:
         Loss : Y/Gamma * (1 - Y)^T dot A
-    '''
+    """
     D = torch.sparse.sum(A, dim=1).to_dense()
     Gamma = torch.mm(Y.t(), D.unsqueeze(1).float())
     YbyGamma = torch.div(Y, Gamma.t())
@@ -157,19 +162,20 @@ def custom_loss_sparse(Y, A):
         loss += torch.dot(YbyGamma[idx[0,i],:], Y_t[:,idx[1,i]])
     return loss
 
-def RandLargeGraph(N,c):
-    '''
+
+def RandLargeGraph(N, c):
+    """
     Creates large random graphs with c fraction connections compared to the actual graph size
-    '''
+    """
     i = (torch.LongTensor(2,int(c * N)).random_(0, N))
     v = 1. * torch.ones(int(c * N))
     return torch.sparse.FloatTensor(i, v, torch.Size([N, N]))
 
 
-def test_backward(Y,A):
-    '''
+def test_backward(Y, A):
+    """
     This a function to debug if the gradients from the CutLoss class match the actual gradients
-    '''
+    """
     idx = A._indices()
     data = A._values()
     D = torch.sparse.sum(A, dim=1).to_dense()
@@ -205,9 +211,6 @@ def test_backward(Y,A):
     print(gradient)
 
 
-
-
-
 def normalize(mx):
     """Row-normalize sparse matrix"""
     rowsum = np.array(mx.sum(1))
@@ -238,6 +241,7 @@ def symnormalise(M):
 
     return (DHI.dot(M)).dot(DHI)
 
+
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
@@ -247,14 +251,16 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
 
+
 def test_partition(Y):
     _, idx = torch.max(Y, 1)
     return idx
 
-def Train_dense(model, x, adj, A, optimizer):
-    '''
+
+def train_dense(model, x, adj, A, optimizer):
+    """
     Training Specifications
-    '''
+    """
 
     max_epochs = 100
     min_loss = 100

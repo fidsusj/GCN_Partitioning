@@ -50,7 +50,6 @@ class GraphConvolution(Module):
 
 
 class GCN(torch.nn.Module):
-
     def __init__(self, gl, ll, dropout):
         super(GCN, self).__init__()
         if ll[0] != gl[-1]:
@@ -83,7 +82,7 @@ class GCN(torch.nn.Module):
 
 
 class CutLoss(torch.autograd.Function):
-    '''
+    """
     Class for forward and backward pass for the loss function described in https://arxiv.org/abs/1903.00614
 
     arguments:
@@ -92,7 +91,7 @@ class CutLoss(torch.autograd.Function):
 
     Returns:
         Loss : Y/Gamma * (1 - Y)^T dot A
-    '''
+    """
 
     @staticmethod
     def forward(ctx, Y, A):
@@ -102,7 +101,7 @@ class CutLoss(torch.autograd.Function):
         YbyGamma = torch.div(Y, Gamma.t())
         # print(Gamma)
         Y_t = (1 - Y).t()
-        loss = torch.tensor([0.], requires_grad=True).to('cuda')
+        loss = torch.tensor([0.], requires_grad=True).to('cpu')
         idx = A._indices()
         data = A._values()
         for i in range(idx.shape[1]):
