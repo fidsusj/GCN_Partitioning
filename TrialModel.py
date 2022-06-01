@@ -1,20 +1,21 @@
-from __future__ import division, print_function
-
-import argparse
-import time
+from __future__ import division
+from __future__ import print_function
 
 import networkx as nx
+import tqdm
+import time
+import argparse
 import numpy as np
 import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-import tqdm
-from scipy import sparse
 
+from helpers.eval import calculate_edge_cut
+from utils import *
+from scipy import sparse
 from models import *
 from preprocessing import input
-from utils import *
 
 
 def train(model, x, adj, A, optimizer):
@@ -22,7 +23,7 @@ def train(model, x, adj, A, optimizer):
     Training Specifications
     """
 
-    max_epochs = 100
+    max_epochs = 5
     min_loss = 100
     for epoch in (range(max_epochs)):
         Y = model(x, adj)
@@ -36,14 +37,14 @@ def train(model, x, adj, A, optimizer):
         optimizer.step()
 
 
-def test(model, x, adj, A, *argv):
+def test(model, nx_graph, x, adj, A, *argv):
     """
     Test Final Results
     """
     model.load_state_dict(torch.load("./trial_weights.pt"))
     Y = model(x, adj)
     node_idx = test_partition(Y)
-    print(node_idx)
+    print(f"Edge cut: {calculate_edge_cut(nx_graph, node_idx)}")
     if argv != ():
         if argv[0] == 'debug':
             print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(custom_loss(Y,A).item()))
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     nx_graph = input.read_partitioned_graph("./data/experimental/road/road-euroroad.graph", "./data/experimental/road/road-euroroad.16.0.ptn", 16)
     A = nx.to_scipy_sparse_matrix(nx_graph)
     # A = input_matrix()
+    # nx_graph = nx.from_scipy_sparse_matrix(A)
 
     # Modifications
     A_mod = A + sp.eye(A.shape[0])  # Adding Self Loop
@@ -92,4 +94,4 @@ if __name__ == '__main__':
     train(model, x, adj, As, optimizer)
 
     # Test the best partition
-    test(model, x, adj, As)
+    test(model, nx_graph, x, adj, As)

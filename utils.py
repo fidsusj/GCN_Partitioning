@@ -1,13 +1,11 @@
 import math
-
 import numpy as np
-import scipy.sparse as sp
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn.modules.module import Module
+import scipy.sparse as sp
 from torch.nn.parameter import Parameter
-
+from torch.nn.modules.module import Module
+import torch.nn.functional as F
+import torch.nn as nn
 from models import *
 
 

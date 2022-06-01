@@ -35,5 +35,5 @@ def read_partitioned_graph(graph_path, partition_path, k):
 
 
 if __name__ == '__main__':
-    uk = read_partitioned_graph("../data/experimental/road/road-euroroad.graph", "../data/experimental/road/road-euroroad.16.0.ptn", 16)
-    print(f"Nodes: {uk.number_of_nodes()}, Edges: {uk.number_of_edges()}")
+    nx_graph = read_partitioned_graph("../data/experimental/road/road-euroroad.graph", "../data/experimental/road/road-euroroad.16.0.ptn", 16)
+    print(f"Nodes: {nx_graph.number_of_nodes()}, Edges: {nx_graph.number_of_edges()}")
