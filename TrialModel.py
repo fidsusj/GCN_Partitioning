@@ -27,7 +27,7 @@ def train(model, x, adj, A, optimizer):
     min_loss = 100
     for epoch in (range(max_epochs)):
         Y = model(x, adj)
-        loss = CutLoss.apply(Y,A)
+        loss = CutLoss.apply(Y, A)
         # loss = custom_loss(Y, A)
         print('Epoch {}:   Loss = {}'.format(epoch, loss.item()))
         if loss < min_loss:
@@ -47,9 +47,9 @@ def test(model, nx_graph, x, adj, A, *argv):
     print(f"Edge cut: {calculate_edge_cut(nx_graph, node_idx)}")
     if argv != ():
         if argv[0] == 'debug':
-            print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(custom_loss(Y,A).item()))
+            print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(custom_loss(Y, A).item()))
     else:
-        print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(CutLoss.apply(Y,A).item()))
+        print('Normalized Cut obtained using the above partition is : {0:.3f}'.format(CutLoss.apply(Y, A).item()))
 
 
 if __name__ == '__main__':
@@ -64,6 +64,7 @@ if __name__ == '__main__':
     # Modifications
     A_mod = A + sp.eye(A.shape[0])  # Adding Self Loop
     norm_adj = symnormalise(A_mod)  # Normalization using D^(-1/2) A D^(-1/2)
+
     adj = sparse_mx_to_torch_sparse_tensor(norm_adj)  # SciPy to Torch sparse
     As = sparse_mx_to_torch_sparse_tensor(A)  # SciPy to sparse Tensor
     A = sparse_mx_to_torch_sparse_tensor(A).to_dense()  # SciPy to Torch Tensor

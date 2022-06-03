@@ -38,7 +38,7 @@ def check_grad(model, x, adj, A, As):
     Y.register_hook(print)
     print(Y)
     print('\n')
-    loss1 = CutLoss.apply(Y,As)
+    loss1 = CutLoss.apply(Y, As)
     loss = custom_loss(Y, A)
     print('\n')
     loss.backward()
@@ -113,7 +113,7 @@ def custom_loss(Y, A):
 
     arguments:
         Y_ij : Probability that a node i belongs to partition j
-        A : dense adjecency matrix
+        A : dense adjacency matrix
 
     Returns:
         Loss : Y/Gamma * (1 - Y)^T dot A
